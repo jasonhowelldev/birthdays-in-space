@@ -24,12 +24,16 @@ function viewImages(){
 
     //console.log(`date entered : ${inputDate} and api key : ${localStorage.getItem("apiKey")}`)
     const birthdayYear = parseInt(inputDate.substring(0,4))
-    const birthdayMonth = parseInt(inputDate.substring(6,7))
-    const birthdayDay = parseInt(inputDate.substring(9,10))
+    const birthdayMonth = parseInt(inputDate.substring(5,7))
+    const birthdayDay = parseInt(inputDate.substring(8,10))
+    console.log(`input birthday ${inputDate} : ${birthdayYear}-${birthdayMonth}-${birthdayDay}`)
 
     // need to get the image for every year from their birthday to today
 
     /// first, get the api url for each year in an array
+
+    // // TODO : check to see if birthday has happened yet this year, if not, skip it
+    // // TODO : started June 16, 1995 so anything before that will be undefined
     let urls = []
     for ( i = 0; i+birthdayYear <= todayYYYY; i++) {
         //console.log(`loop : ${i}  and current loop year : ${i+birthdayYear}`)
@@ -40,48 +44,33 @@ function viewImages(){
     let yearlyData = []
 
     urls.forEach((url, i) => {
+        let li = document.createElement('li')
+        li.id = url
+        
+        
+        document.querySelector('ul').appendChild(li)
+        
+
             fetch(url)
             .then(response => response.json())
             .then(data => {
-                //console.log(data)
+                console.log(data)
                 yearlyData[i] = data
 
-                const li = document.createElement('li')
+                //const li = document.createElement('li')
                 li.textContent = `${data.date} : ${data.title}`
+
+                let img = document.createElement('img')
+                img.src = data.url
+                img.width = 256
+                img.height = 256
+                document.getElementById(url).appendChild(img)
                 
-                document.querySelector('ul').appendChild(li)
+                //document.querySelector('ul').appendChild(li)
 
         })
 
     })
-
-
-    /*
-    // this will sort the array by the year
-    yearlyData.sort(function(a,b) {
-        if ( (a.date.substring(0,4)) < (b.date.substring(0,4)) ) {
-            return -1
-        }
-    })
-    */
-
-    // now it's time to create the li for each element in the yearlyData array and append the html ul with the list
-    /*
-    yearlyData.forEach(element => console.log("another one"))
-    console.log(yearlyData)
-    
-    yearlyData.forEach(year => {
-        console.log('add another ul')
-        const li = document.createElement('li')
-        li.textContent = year.title
-        document.querySelector('ul').appendChild(li)
-    })
-    */
-
-    for(i=0; i < yearlyData.length; i++){
-        console.log(yearlyData[i])
-    }
-    
 
     // check to see if their birthday has happened this year, if not say something like
     // " who know what NASA might on your next birthday in <numberOfDaysUntilNextBirthday> days" 
