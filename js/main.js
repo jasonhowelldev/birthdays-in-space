@@ -11,12 +11,10 @@ if (!localStorage.getItem("apiKey")) {
 
 // get the current date so we can see how many years to get images for
 const today = new Date()
-console.log(`current date before editing : ${today}`)
 const todayYYYY = today.getFullYear()
 const todayMM = String(today.getMonth() + 1).padStart(2, '0')
 const todayDD = String(today.getDate()).padStart(2, '0')
 const todayPretty = `${todayYYYY}-${todayMM}-${todayDD}`
-console.log(`current date : ${todayPretty}`)
 
 
 function viewImages(){
@@ -50,6 +48,7 @@ function viewImages(){
     }
 
     /// make each api call and append data to the DOM
+    
     urls.forEach((url, i) => {
         let li = document.createElement('li')
         li.id = url
@@ -61,12 +60,22 @@ function viewImages(){
             .then(data => {
                 li.textContent = `${data.date} : ${data.title}`
 
-                let img = document.createElement('img')
-                // TODO : set image size in css
-                img.src = data.url
-                img.width = 256
-                img.height = 256
-                document.getElementById(url).appendChild(img)
+                if ( data.media_type == 'image') {
+                    let img = document.createElement('img')
+                    img.src = data.url
+                    // TODO : set image size in css
+                    img.width = 256
+                    img.height = 256
+                    document.getElementById(url).appendChild(img)
+                }else if ( data.media_type == 'video') {
+                    let vod = document.createElement('iframe')
+                    vod.src = data.url
+                    vod.width = 256
+                    vod.height = 256
+                    vod.allowFullscreen = true
+                    document.getElementById(url).appendChild(vod)
+                }
+
         })
 
     })
