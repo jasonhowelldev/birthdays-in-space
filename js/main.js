@@ -20,13 +20,15 @@ console.log(`current date : ${todayPretty}`)
 
 
 function viewImages(){
-    const inputDate = document.querySelector('input').value
+    // clear anything that might already be present
+    document.querySelector('ul').innerHTML=''
 
-    //console.log(`date entered : ${inputDate} and api key : ${localStorage.getItem("apiKey")}`)
+    const inputDate = document.querySelector('input').value
     const birthdayYear = parseInt(inputDate.substring(0,4))
     const birthdayMonth = parseInt(inputDate.substring(5,7))
     const birthdayDay = parseInt(inputDate.substring(8,10))
-    console.log(`input birthday ${inputDate} : ${birthdayYear}-${birthdayMonth}-${birthdayDay}`)
+    
+    console.log(`birthday : ${birthdayYear}-${birthdayMonth}-${birthdayDay}`)
 
     // need to get the image for every year from their birthday to today
 
@@ -36,8 +38,32 @@ function viewImages(){
     // // TODO : started June 16, 1995 so anything before that will be undefined
     let urls = []
     for ( i = 0; i+birthdayYear <= todayYYYY; i++) {
+        let shouldAddRequest = true
+        
+        // check if birthday occurs before June 16, 1995
+        if ( i+birthdayYear <  1995) {
+            console.log("year is before 1995, too early for images to start")
+            shouldAddRequest = false
+        }else if ( i+birthdayYear ==  1995 && birthdayMonth < 06) {
+            console.log("before June on 1995, images have not started yet")
+            shouldAddRequest = false
+        }else if ( i+birthdayYear ==  1995 && birthdayMonth == 06 && birthdayDay < 16) {
+            console.log("June of 1995, but is it before the 16th, images have not started yet")
+            shouldAddRequest = false
+        }
+
+        // check if birthday is after current date
+        console.log(`compare dates ${inputDate} > ${today}`)
+        if ( inputDate > today ) {
+            console.log("the input date is after today's date")
+            shouldAddRequest = false
+        }
+    
         //console.log(`loop : ${i}  and current loop year : ${i+birthdayYear}`)
-        urls[i] = `https://api.nasa.gov/planetary/apod?api_key=${localStorage.getItem('apiKey')}&date=${i+birthdayYear}-${birthdayMonth}-${birthdayDay}`
+        if ( shouldAddRequest ) {
+            urls[i] = `https://api.nasa.gov/planetary/apod?api_key=${localStorage.getItem('apiKey')}&date=${i+birthdayYear}-${birthdayMonth}-${birthdayDay}`
+        }
+        
     }
 
     /// now, store the data received from each url into an array
@@ -54,7 +80,7 @@ function viewImages(){
             fetch(url)
             .then(response => response.json())
             .then(data => {
-                console.log(data)
+                //console.log(data)
                 yearlyData[i] = data
 
                 //const li = document.createElement('li')
